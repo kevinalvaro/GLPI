@@ -1,0 +1,21 @@
+<VirtualHost *:80>
+  ServerName {{ server_name }}
+
+  DocumentRoot /var/www/glpi/public
+
+  # If you want to place GLPI in a subfolder of your site (e.g. your virtual host is serving multiple applications),
+  # you can use an Alias directive:
+  # Alias "/glpi" "/var/www/glpi/public"
+
+  <Directory /var/www/glpi/public>   
+
+    Require all granted
+
+    RewriteEngine On
+
+    # Redirect all requests   
+ to the GLPI router, unless file exists.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php [QSA,L]
+  </Directory>
+</VirtualHost>
