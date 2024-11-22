@@ -1,0 +1,123 @@
+---
+- name: Install and configure GLPI
+  hosts: ubuntuvm
+  become: yes
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ apt_packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        apt_packages:
+          - apache2
+          - mariadb-server
+          - php
+          - php-common
+          - php-mysql
+          - libapache2-mod-php
+          - php-gd
+          - php-curl
+          - php-json
+          - php-xmlrpc
+          - php-intl
+          - php-bcmath
+          - php-zip
+          - php-apcu
+          - php-mbstring
+          - php-fileinfo
+          - php-xml
+          - php-soap
+          - php-zip
+
+    - name: Configure PHP settings
+      copy:
+        dest: /etc/php/8.1/apache2/php.ini
+        content: |
+          memory_limit = 512M
+          date.timezone = UTC
+          upload_max_filesize = 16M
+          session.cookie_httponly = on
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Restart Apache after PHP config change
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Create the GLPI database
+      mysql_db:
+        name: glpidb
+        state: present
+        login_host: localhost
+        login_user: root
+        login_password: "{{ mysql_root_password }}"  # Set this secret variable in group_vars/all or a vault
+
+    - name: Create a GLPI database user
+      mysql_user:
+        name: glpi
+        password: password  # Change this weak password to a strong one
+        host: localhost
+        priv: glpidb.*=grant
+        login_host: localhost
+        login_user: root
+        login_password: "{{ mysql_root_password }}"  # Set this secret variable
+
+    - name: Download GLPI archive
+      get_url:
+        url: https://github.com/glpi-project/glpi/releases/download/10.0.9/glpi-10.0.9.tgz
+        dest: /var/www/glpi-10.0.9.tgz
+        mode: 0644
+
+    - name: Extract GLPI archive
+      archive:
+        path: /var/www/glpi-10.0.9.tgz
+        dest: /var/www/glpi
+        extract: yes
+        owner: www-data
+        group: www-data
+
+    - name: Set ownership and permissions for GLPI files
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: 0755
+      with_items:
+        - /var/www/glpi/{files,config}
+
+    # - name: Enable Apache rewrite module
+    #   apache_mod:
+    #     name: rewrite
+    #     state: enabled
+    - name: Enable rewrite module
+      apache2_module:
+        name: rewrite
+        state: enabled
+        ignore_configcheck: True
+
+    - name: Create Apache virtual host for GLPI
+      template:
+        src: https://raw.githubusercontent.com/kevinalvaro/GLPI/glpi.conf.j2
+        dest: /etc/apache2/sites-available/glpi.conf
+        owner: root
+        group: root
+        mode: 0644
+      vars:
+        server_name: glpi.example.com  # Replace with your desired server name
+
+    # - name: Enable GLPI virtual host
+    #   apache_site:
+    #     name: glpi.conf
+    #     state: enabled
+    - name: Enable GLPI virtual host
+      command: a2ensite glpi.conf
+
+    - name: Restart Apache after configuration changes
+      service:
+        name: apache2
+        state: restarted
