@@ -5,7 +5,12 @@ function info(){
     echo -e '\e[36m'$1'\e[0m';
 }
 
-
+function network_info()
+{
+INTERFACE=$(ip route | awk 'NR==1 {print $5}')
+IPADRESS=$(ip addr show $INTERFACE | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | head -n 1)
+HOST=$(hostname)
+}
 function install_packages()
 {
 info "Installing packages..."
@@ -151,8 +156,8 @@ info "If you encounter any issue with this script, please report it on GitHub: h
 
 # check_root
 # confirm_installation
-# network_info
-# install_packages
+network_info
+install_packages
 mariadb_configure
 install_glpi
 setup_db
