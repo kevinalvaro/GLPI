@@ -55,11 +55,8 @@ elif [ "$DISTRO" == "Ubuntu" ]; then
         if [[ " ${UBUNTU_VERSIONS[*]} " == *" $VERSION "* ]]; then
                 info "Your operating system version ($DISTRO $VERSION) is compatible."
         else
-                warn "Your operating system version ($DISTRO $VERSION) is not noted as compatible."
-                warn "Do you still want to force the installation? Be careful, if you choose to force the script, it is at your own risk."
-                info "Are you sure you want to continue? [yes/no]"
-                response="yes"
-                fi
+                response="yes"     
+                fi         
         fi
 # Si c'est une autre distribution
 else
@@ -145,7 +142,7 @@ mysql -e "FLUSH PRIVILEGES"
 # Initialize time zones datas
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p'$SLQROOTPWD' mysql
 #Ask tz
-dpkg-reconfigure tzdata
+# dpkg-reconfigure tzdata
 systemctl restart mariadb
 sleep 1
 mysql -e "GRANT SELECT ON mysql.time_zone_name TO 'glpi_user'@'localhost'"
@@ -225,11 +222,10 @@ info "If you encounter any issue with this script, please report it on GitHub: h
 }
 
 
-check_root
-check_distro
-confirm_installation
-network_info
-install_packages
+# check_root
+# confirm_installation
+# network_info
+# install_packages
 mariadb_configure
 install_glpi
 setup_db
