@@ -166,5 +166,5 @@ install_packages
 mariadb_configure
 install_glpi
 setup_db
-display_credentials
 install_packages
+display_credentials
