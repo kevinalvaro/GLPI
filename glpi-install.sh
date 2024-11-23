@@ -166,7 +166,4 @@ network_info
 mariadb_configure
 install_glpi
 setup_db
-sleep 5
-install_glpi
-setup_db
 display_credentials
