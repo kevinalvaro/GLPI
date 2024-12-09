@@ -155,7 +155,7 @@ info "If you encounter any issue with this script, please report it on GitHub: h
 # check_root
 # confirm_installation
 network_info
-# install_packages
+install_packages
 mariadb_configure
 install_glpi
 setup_db
