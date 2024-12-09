@@ -15,16 +15,6 @@ HOST=$(hostname)
 }
 function install_packages()
 {
-info "Installing packages..."
-sleep 1
-apt update
-apt install --yes --no-install-recommends \
-apache2 \
-mariadb-server \
-perl \
-curl \
-jq \
-php
 info "Installing php extensions..."
 apt install --yes --no-install-recommends \
 php-ldap \
