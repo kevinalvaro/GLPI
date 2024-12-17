@@ -17,6 +17,11 @@ function install_packages()
 {
 info "Installing php extensions..."
 apt install --yes --no-install-recommends \
+
+perl \
+curl \
+jq \
+pkg-config \
 php-ldap \
 php-imap \
 php-apcu \
