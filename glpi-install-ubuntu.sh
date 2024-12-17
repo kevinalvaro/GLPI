@@ -17,7 +17,9 @@ function install_packages()
 {
 info "Installing php extensions..."
 apt install --yes --no-install-recommends \
-
+apache2 \
+mariadb-server \
+php \
 perl \
 curl \
 jq \
